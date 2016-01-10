@@ -36,5 +36,34 @@ public class MainRef
                 System.out.println("photoURL = " + result.getString(5));
                 System.out.println();
         }
+        
+        
+        
+        
+        
+        
+        
+        
+     // USER DEFINED VARS
+
+ 	   String remote = "jdbc:mysql://176.32.230.251/cl57-moviedb";
+ 	   String local = "jdbc:mysql://localhost:3306/moviedb";
+ 	   
+ 	   String Q1 = "SELECT * FROM MOVIES WHERE moviedb.stars = ";
+ 	   
+ 	   
+ 	// Incorporate mySQL driver
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+
+         // Connect to the test database
+        Connection connection2 = (Connection)DriverManager.getConnection(remote,"cl57-moviedb", "arpanjoe");
+        
+        // Create an execute an SQL statement to select all of table"Stars" records
+        Statement select2 = connection.createStatement();
+        ResultSet result2 = select.executeQuery("SELECT * from stars limit 1,10");
+        while(result2.next()){
+     	   System.out.println("names: " + result2.getString(2)+ " "+ result2.getString(3));
+        } 
+
     }
 }
