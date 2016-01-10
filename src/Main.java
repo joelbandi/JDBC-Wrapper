@@ -33,7 +33,7 @@ public class Main {
 		}catch (Exception e){
 			System.out.println("\n"
 					+ "***********************************\n"
-					+ "com.mysql.jdbc.Driver FAILED!\n"
+					+ "com.mysql.jdbc.Driver instantiation FAILED!\n"
 					+ "***********************************\n");
 					restart();
 		}
@@ -44,6 +44,7 @@ public class Main {
 		System.out.println("Password: "); password = inp.next();
 		try{
 			connection = (Connection)DriverManager.getConnection(remote,"cl57-moviedb", "arpanjoe");
+			System.out.println("Congratulations! connection to movie database established!!");
 		}catch(Exception e){
 			System.out.println("\n"
 					+ "***********************************\n"
@@ -64,19 +65,33 @@ public class Main {
     	   System.out.println("Please make a choice");
     	   choice  = inp.nextInt();
     	   switch (choice) {
-		case 1: 
+		
+    	   
+    	   
+    	   
+    	case 1: 
 			System.out.println(" Please enter a name: ");
 			String a = inp.nextLine();
 			searchmovies(a);
 			break;
+			
+			
+			
+		
 		case 2:
 			System.out.println(" Please enter a name: ");
 			String b = inp.nextLine();
 			addstar(b);
 		break;
+		
+		
+		
+		
+		
 		case 3: 
 			
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			System.out.println("Adding Customer...");
 			System.out.println(" Please enter the id: ");
 			int id = inp.nextInt();			
 			String[] prompts = {
@@ -93,12 +108,15 @@ public class Main {
 			        ar.add(br.readLine());
 			        
 			    }
-			
-			
 			Customer customer = new Customer(id,ar.get(0),ar.get(1),ar.get(2),ar.get(3),ar.get(4),ar.get(5));
 			addcustomer(customer.getId(),customer.getFirst_name(),customer
 					.getLast_name(),customer.getCc(),customer
 					.getAdd(),customer.getEmail(),customer.getPwd());
+			
+			
+			
+			
+			
 		default:
 			restart();
 			break;
@@ -110,7 +128,14 @@ public class Main {
 	private static void addcustomer(int id, String first, String last, String cc, String add, String email, String pwd) throws SQLException {
 		 Statement query = connection.createStatement();
 		 try{
-		 query.executeUpdate("INSERT INTO customers VALUES("+Integer.toString(id)+","+first+","+last+","+cc+","+add+","+email+","+pwd+")");
+		 query.executeUpdate("INSERT INTO customers VALUES("
+                 + id + ", '"
+                 + first + "', '"
+                 + last + "', '"
+                 + cc + "', '"
+                 + add + "','"
+                 + email + "','"
+                 + pwd + "');");
 		 }catch(SQLException e){
 			 System.out.println("Credit card does not exist");
 			 System.out.println(e);
