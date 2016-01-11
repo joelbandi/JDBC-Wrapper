@@ -1,3 +1,8 @@
+
+
+
+DONE::
+
 Print out (to the screen) the movies featuring a given star.
  All movie attributes should appear, labeled and neatly arranged; the 
  star can be queried via first name and/or last name or by ID. First 
@@ -5,19 +10,9 @@ Print out (to the screen) the movies featuring a given star.
   a) first name AND last name b) first name or last name.
 
 
-
-
-
-
-
-
 Insert a new star into the database. 
 If the star has a single name, add it as his last_name and assign an 
 empty string ("") to first_name.
-
-
-
-
 
 
 
@@ -29,9 +24,9 @@ does not exist in the credit card table.
  and assign an empty string ("") to first_name.
 
 
+-----------------------------------------------------------------------------------------------------------------------
 
-
-
+PENDING::
 
 Delete a customer from the database.
 
@@ -70,3 +65,12 @@ Exit the menu (and return to the get-the-database/user/password state)
 
 
 Exit the program.
+
+
+-----------------------------------------------------------------------------------------------------------------------
+INFO::
+
+
+
+Direct Known Subclasses of SQL EXCEPTION:
+SQLDataException, SQLFeatureNotSupportedException, SQLIntegrityConstraintViolationException, SQLInvalidAuthorizationSpecException, SQLNonTransientConnectionException, SQLSyntaxErrorException

@@ -39,7 +39,7 @@ public class Main {
 		 
 		jdbcInit();
 		
-		System.out.println("--->Welcome to the PIKFLIX<---"); 
+		System.out.println("--->Welcome to PIKFLIX<---"); 
 		
 		loginToDatabase();
 
@@ -76,13 +76,52 @@ public class Main {
 			
 			
 		case 2:
-			System.out.println(" Please enter a name: ");
-			String b = inp.nextLine();
-			addstar(b);
+			//Add a star...
+			BufferedReader br1 = new BufferedReader(new InputStreamReader(System.in));
+			System.out.println("Adding Star...");
+			System.out.println(" Please enter the id: ");
+			int id1;
+			try {
+				id1= inp.nextInt();
+			} catch (InputMismatchException e1) {
+				System.out.println("You did not enter a number!!");
+				System.out.println("Try again");
+				id1 = inp.nextInt();
+			}			
+			
+			String[] prompts1 = {
+					"Please enter a first name: ",
+					"Please enter a last name: ",
+					"Please enter a dob: ",
+					"Please enter a photo url: ",
+					
+			};
+			ArrayList<String> ar1 = new ArrayList<String>();
+			for (String prompt : prompts1) {
+				System.out.println(prompt);
+				try {
+					ar1.add(br1.readLine());
+				} catch (IOException e) {
+					System.out.println(e);
+				}
+
+			}
+			if(ar1.get(0)!="" && ar1.get(1)==""){
+				ar1.set(1, ar1.get(0));
+				ar1.set(0,"");
+			}
+		
+			Star star = new Star(id1,ar1.get(0),ar1.get(1),ar1.get(2),ar1.get(3));
+			try {
+				addstar(star.getId(),star.getFirst_name(),star.getLast_name(),star.getDob(),star.getPhotoURL());
+			}catch (SQLException e) {
+				System.out.println("Could not add star");
+			}
 			break;
 			
 			
 		case 3: 
+			//Add a customer...
 			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 			System.out.println("Adding Customer...");
 			System.out.println(" Please enter the id: ");
@@ -197,15 +236,26 @@ public class Main {
                  + email + "','"
                  + pwd + "');");
 		 System.out.println("Customer "+first+" "+last+" successfully added");
-		 mainMenu();
-		 }catch(SQLException e){
+		 }catch(SQLIntegrityConstraintViolationException e){
 			 System.out.println("Credit card does not exist");
+		 }catch(SQLSyntaxErrorException e){
+			 System.out.println(" Input not recognized");
 		 }
 	}
 
-	private static void addstar(String b) {
-		// TODO Auto-generated method stub
-		
+	private static void addstar(int id,String first,String last,String dob,String photo) throws SQLException {
+		Statement query = connection.createStatement();
+		 try{
+		 query.executeUpdate("INSERT INTO stars VALUES("
+                 + id + ", '"
+                 + first + "', '"
+                 + last + "', DATE('"
+                 + dob + "'), '"
+                 + photo + "');");
+		 System.out.println("Star "+first+" "+last+" successfully added");
+		 }catch(SQLSyntaxErrorException e){
+			 System.out.println("Input not recognized");
+		 }
 	}
 
 	private static void searchmovies(String a) {
