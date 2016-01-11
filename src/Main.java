@@ -14,8 +14,6 @@ import java.util.Scanner;
 
 public class Main {
 	
-	
-	static int choice;
 	static Scanner inp = new Scanner(System.in);
 	static boolean exit;
 	static String remote = "jdbc:mysql://176.32.230.251/cl57-moviedb";
@@ -60,22 +58,18 @@ public class Main {
 		System.out.println("2. Add a star");
 		System.out.println("3. Add a customer");
 		System.out.println("4. Delete a customer");
-		System.out.println("5. Provide metadata");
+		System.out.println("5. Get metadata");
 		System.out.println("6. Run custom SQL query");
 		System.out.println("7. Logout");
 		System.out.println("8. Exit");
 		System.out.println("\nPlease make a choice");
-		choice  = inp.nextInt();
+		int choice;
+		choice = inp.nextInt();
 		switch (choice) {
-		
-		
 		case 1: 
-			System.out.println(" Please enter a name: ");
-			String a = inp.nextLine();
-			searchmovies(a);
+			searchmoviesX();
 			break;
-			
-			
+
 		case 2:
 			//Add a star...
 			addstarX();
@@ -89,14 +83,20 @@ public class Main {
 		
 		
 		case 4:
+			//Delete a customer...
+			deletecustomerX();
 			break;
 			
 			
 		case 5:
+			//Get metadata...
+			getmetadata();
 			break;
 			
 			
 		case 6:
+			//Custom...
+			customqueryX();
 			break;
 			
 			
@@ -213,6 +213,7 @@ public class Main {
 		 }
 	}
 	
+	//------------------------------------------------
 	private static void addstarX(){
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("Adding Star...");
@@ -226,15 +227,15 @@ public class Main {
 			id = inp.nextInt();
 		}			
 		
-		String[] prompts1 = {
+		String[] prompts = {
 				"Please enter a first name: ",
 				"Please enter a last name: ",
-				"Please enter a dob: ",
+				"Please enter a dob in YYYY/MM/DD: ",
 				"Please enter a photo url: ",
 				
 		};
 		ArrayList<String> ar = new ArrayList<String>();
-		for (String prompt : prompts1) {
+		for (String prompt : prompts) {
 			System.out.println(prompt);
 			try {
 				ar.add(br.readLine());
@@ -253,6 +254,7 @@ public class Main {
 			addstar(star.getId(),star.getFirst_name(),star.getLast_name(),star.getDob(),star.getPhotoURL());
 		}catch (SQLException e) {
 			System.out.println("Could not add star");
+			e.printStackTrace();
 		}
 		return;
 	}
@@ -270,10 +272,76 @@ public class Main {
 			 System.out.println("Input not recognized");
 		 }
 	}
+	//------------------------------------------------
+	private static void deletecustomerX(){
+		System.out.println("Deleting customer...");
+		System.out.println(" Please enter the id: ");
+		int id2;
+		try {
+			id2= inp.nextInt();
+		} catch (InputMismatchException e1) {
+			System.out.println("You did not enter a number!!");
+			System.out.println("Try again");
+			return;
+		}	
+		
+		try {
+			deletecustomer(id2);
+		} catch (SQLException e) {
+			System.out.println("Customer record does not exist: ");
+		}
+	}
+	private static void deletecustomer(int id) throws SQLException {
+		Statement update = connection.createStatement();
+        update.executeUpdate("delete from customers where id = "+id);
+		
+	}
+	//------------------------------------------------
+	private static void getmetadata() {   
+        boolean nextTable = false;
+        try {
+            
+            Statement select = connection.createStatement();
+            Statement tableQuery = connection.createStatement();
+            ResultSet tableList = tableQuery.executeQuery("SHOW TABLES");
 
-	private static void searchmovies(String a) {
+            
+            while (tableList.next()) {
+                if (nextTable) {
+                    //pause(); 
+                    System.out.println("______________________________________");
+                } else {
+                    nextTable = true;
+                }
+                String table = tableList.getString(1);
+                System.out.println("\nTABLE: " + table);
+                ResultSet result = select.executeQuery("Select * from " + table);
+                ResultSetMetaData metadata = result.getMetaData();
+                System.out.println("\n" + metadata.getColumnCount() + "= number of columns");
+                for (int i = 1; i <= metadata.getColumnCount(); i++) {
+                    System.out.println("(" + i + ") " + metadata.getColumnName(i) + " :: " + metadata.getColumnTypeName(i));
+                }
+                System.out.println("\n______________________________________");
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex);
+        }
+    }
+	//------------------------------------------------
+	private static void searchmoviesX() {
 		// TODO Auto-generated method stub
 		
+	}
+	//------------------------------------------------
+	private static void customqueryX(){
+		System.out.println("enter query");
+//		String cmd = inp.next();
+//		try {
+//			Statement query = connection.createStatement();
+//			query.executeQuery(cmd);
+//		} catch (SQLException e) {
+//			System.out.println(e);
+//		}
 	}
 	
 
