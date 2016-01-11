@@ -63,6 +63,7 @@ public class Main {
 		System.out.println("5. Provide metadata");
 		System.out.println("6. Run custom SQL query");
 		System.out.println("7. Logout");
+		System.out.println("8. Exit");
 		System.out.println("\nPlease make a choice");
 		choice  = inp.nextInt();
 		switch (choice) {
@@ -77,87 +78,13 @@ public class Main {
 			
 		case 2:
 			//Add a star...
-			BufferedReader br1 = new BufferedReader(new InputStreamReader(System.in));
-			System.out.println("Adding Star...");
-			System.out.println(" Please enter the id: ");
-			int id1;
-			try {
-				id1= inp.nextInt();
-			} catch (InputMismatchException e1) {
-				System.out.println("You did not enter a number!!");
-				System.out.println("Try again");
-				id1 = inp.nextInt();
-			}			
-			
-			String[] prompts1 = {
-					"Please enter a first name: ",
-					"Please enter a last name: ",
-					"Please enter a dob: ",
-					"Please enter a photo url: ",
-					
-			};
-			ArrayList<String> ar1 = new ArrayList<String>();
-			for (String prompt : prompts1) {
-				System.out.println(prompt);
-				try {
-					ar1.add(br1.readLine());
-				} catch (IOException e) {
-					System.out.println(e);
-				}
-
-			}
-			if(ar1.get(0)!="" && ar1.get(1)==""){
-				ar1.set(1, ar1.get(0));
-				ar1.set(0,"");
-			}
-		
-			Star star = new Star(id1,ar1.get(0),ar1.get(1),ar1.get(2),ar1.get(3));
-			try {
-				addstar(star.getId(),star.getFirst_name(),star.getLast_name(),star.getDob(),star.getPhotoURL());
-			}catch (SQLException e) {
-				System.out.println("Could not add star");
-			}
+			addstarX();
 			break;
 			
 			
 		case 3: 
 			//Add a customer...
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			System.out.println("Adding Customer...");
-			System.out.println(" Please enter the id: ");
-			int id;
-			try {
-				id = inp.nextInt();
-			} catch (InputMismatchException e1) {
-				System.out.println("You did not enter a number!!");
-				System.out.println("Try again");
-				id = inp.nextInt();
-			}			
-			String[] prompts = {
-					"Please enter a first name: ",
-					"Please enter a last name: ",
-					"Please enter a credit card number: ",
-					"Please enter an address: ",
-					"Please enter an email id: ",
-					"Please enter the customer's password: "
-			};
-			ArrayList<String> ar = new ArrayList<String>();
-			for (String prompt : prompts) {
-				System.out.println(prompt);
-				try {
-					ar.add(br.readLine());
-				} catch (IOException e) {
-					System.out.println(e);
-				}
-
-			}
-			Customer customer = new Customer(id,ar.get(0),ar.get(1),ar.get(2),ar.get(3),ar.get(4),ar.get(5));
-			try {
-				addcustomer(customer.getId(),customer.getFirst_name(),customer.getLast_name(),customer.getCc(),customer
-						.getAdd(),customer.getEmail(),customer.getPwd());
-			} catch (SQLException e) {
-				System.out.println("Could not add customer");
-			}
+			addcustomerX();
 			break;
 		
 		
@@ -176,7 +103,10 @@ public class Main {
 		case 7:
 			break;
 			
-			
+		case 8:
+			exit=true;
+			break;
+				
 		default:
 			System.out.println("INVALID OPTION...");
 			break;
@@ -207,7 +137,7 @@ public class Main {
 				System.out.println("Wrong user name and//or password");
 				System.out.println("Try again");
 			}
-			halt("database connectivity issues.");	
+			halt("database connectivity/Login issues.");	
 		}
 	}
 	
@@ -223,7 +153,47 @@ public class Main {
 		}
 	}
 	
-	/*----------------------------------------------------------------------------------------------------------------------*/    	   
+	/*----------------------------------------------------------------------------------------------------------------------*/
+	
+	private static void addcustomerX(){
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Adding Customer...");
+		System.out.println(" Please enter the id: ");
+		int id;
+		try {
+			id = inp.nextInt();
+		} catch (InputMismatchException e1) {
+			System.out.println("You did not enter a number!!");
+			System.out.println("Try again");
+			id = inp.nextInt();
+		}			
+		String[] prompts = {
+				"Please enter a first name: ",
+				"Please enter a last name: ",
+				"Please enter a credit card number: ",
+				"Please enter an address: ",
+				"Please enter an email id: ",
+				"Please enter the customer's password: "
+		};
+		ArrayList<String> ar = new ArrayList<String>();
+		for (String prompt : prompts) {
+			System.out.println(prompt);
+			try {
+				ar.add(br.readLine());
+			} catch (IOException e) {
+				return;
+			}
+
+		}
+		Customer customer = new Customer(id,ar.get(0),ar.get(1),ar.get(2),ar.get(3),ar.get(4),ar.get(5));
+		try {
+			addcustomer(customer.getId(),customer.getFirst_name(),customer.getLast_name(),customer.getCc(),customer
+					.getAdd(),customer.getEmail(),customer.getPwd());
+		} catch (SQLException e) {
+			System.out.println("Could not add customer");
+		}
+		return;
+	}
 	private static void addcustomer(int id, String first, String last, String cc, String add, String email, String pwd) throws SQLException {
 		 Statement query = connection.createStatement();
 		 try{
@@ -242,7 +212,50 @@ public class Main {
 			 System.out.println(" Input not recognized");
 		 }
 	}
+	
+	private static void addstarX(){
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("Adding Star...");
+		System.out.println(" Please enter the id: ");
+		int id;
+		try {
+			id= inp.nextInt();
+		} catch (InputMismatchException e1) {
+			System.out.println("You did not enter a number!!");
+			System.out.println("Try again");
+			id = inp.nextInt();
+		}			
+		
+		String[] prompts1 = {
+				"Please enter a first name: ",
+				"Please enter a last name: ",
+				"Please enter a dob: ",
+				"Please enter a photo url: ",
+				
+		};
+		ArrayList<String> ar = new ArrayList<String>();
+		for (String prompt : prompts1) {
+			System.out.println(prompt);
+			try {
+				ar.add(br.readLine());
+			} catch (IOException e) {
+				return;
+			}
 
+		}
+		if(ar.get(0)!="" && ar.get(1)==""){
+			ar.set(1, ar.get(0));
+			ar.set(0,"");
+		}
+	
+		Star star = new Star(id,ar.get(0),ar.get(1),ar.get(2),ar.get(3));
+		try {
+			addstar(star.getId(),star.getFirst_name(),star.getLast_name(),star.getDob(),star.getPhotoURL());
+		}catch (SQLException e) {
+			System.out.println("Could not add star");
+		}
+		return;
+	}
 	private static void addstar(int id,String first,String last,String dob,String photo) throws SQLException {
 		Statement query = connection.createStatement();
 		 try{
