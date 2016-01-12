@@ -1,8 +1,9 @@
 
-// JDBC Example - printing a database's metadata
-// Coded by Chen Li/Kirill Petrov Winter, 2005
-// Slightly revised for ICS185 Spring 2005, by Norman Jacobson
-//ARPAN TAKE CARE OF THE USER PROOFING
+
+//JOEL TOOK CARE OF THE USER PROOFING!!
+//ARPAN _ SEARCH MOVIES
+//pRACHI_SEARCH MOIVES
+//JOEL _ JUST WROTE THE CUSTOM QUERY FUNCTION>>>WORKS LIKE A CHARM!!!!!
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,12 +15,14 @@ import java.util.Scanner;
 
 public class Main {
 	
-	static Scanner inp = new Scanner(System.in);
-	static boolean exit;
-	static String remote = "jdbc:mysql://176.32.230.251/cl57-moviedb";
-	static String username;
-	static String password;
-	static Connection connection = null;
+	private static Scanner inp = new Scanner(System.in);
+	private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	private static boolean exit;
+	private static String remote = "jdbc:mysql://176.32.230.251/cl57-moviedb";
+	private static String username;
+	private static String password;
+	private static Connection connection = null;
+	private static boolean loggedin;
 	
 	/*----------------------------------------------------------------------------------------------------------------------*/
 	public static void main(String[] arg) throws Exception{
@@ -32,6 +35,7 @@ public class Main {
 		    Thread.currentThread().interrupt();
 		}
 		exit = false;
+		loggedin = false;
 		/*----------------------------------------------------------------------------------------------------------------------*/
 
 		 
@@ -39,12 +43,18 @@ public class Main {
 		
 		System.out.println("--->Welcome to PIKFLIX<---"); 
 		
-		loginToDatabase();
-
+		while(!loggedin && !exit){
+			loginToDatabase();
+		}
 		
 		/*---------------------------------------------super loop---------------------------------------------------------------*/
-		while(!exit){   
-			mainMenu();  
+		while(!exit){
+			mainMenu();
+//			try{
+//				mainMenu();
+//			}catch(InputMismatchException e){
+//				System.out.println("Please enter a valid option!");
+//			}
 		}
 		/*----------------------------------------------------------------------------------------------------------------------*/
 		System.out.println("\nbye...");
@@ -52,7 +62,7 @@ public class Main {
 		
 	}
 
-	private static void mainMenu(){
+	private static void mainMenu() throws Exception{
 		System.out.println("\n\nWhat do you want to do?");
 		System.out.println("1. Search movies by actor");
 		System.out.println("2. Add a star");
@@ -62,7 +72,7 @@ public class Main {
 		System.out.println("6. Run custom SQL query");
 		System.out.println("7. Logout");
 		System.out.println("8. Exit");
-		System.out.println("\nPlease make a choice");
+		System.out.println("\nPlease make a choice: Enter your option Number");
 		int choice;
 		choice = inp.nextInt();
 		switch (choice) {
@@ -96,7 +106,7 @@ public class Main {
 			
 		case 6:
 			//Custom...
-			customqueryX();
+			custom();
 			break;
 			
 			
@@ -104,6 +114,7 @@ public class Main {
 			break;
 			
 		case 8:
+			//Exiting the program;
 			exit=true;
 			break;
 				
@@ -119,6 +130,7 @@ public class Main {
 		exit=true;
 		System.out.println("system halting...");
 		System.out.println("Shut down caused by "+e);
+		System.out.println("Please try again!!");
 	};
 	
 	private static void loginToDatabase(){
@@ -128,16 +140,26 @@ public class Main {
 		try{
 			connection = (Connection)DriverManager.getConnection(remote,username,password);
 			System.out.println("Congratulations! You are connected to the Database!!");
+			loggedin = true;
 		}catch(SQLException e){
 			System.out.println("\n"
-					+ "***********************************\n"
-					+ "FAILED to establish connection\n"
-					+ "***********************************\n");
+					+ " ----------------------------------\n"
+					+"|   FAILED to establish connection  |\n"
+					+ " ----------------------------------\n");
 			if(e.getErrorCode()==1045){
-				System.out.println("Wrong user name and//or password");
-				System.out.println("Try again");
-			}
-			halt("database connectivity/Login issues.");	
+				System.out.println("Wrong user name and/or password");
+				System.out.println("Try again? <y/n> ");
+				String ans = inp.next();
+				if(ans.compareToIgnoreCase("Y")==0){
+					return;
+				}else{
+					exit=true;
+					return;
+				}
+				
+			}else{
+				halt("database connectivity issues.");
+			}					
 		}
 	}
 	
@@ -146,17 +168,15 @@ public class Main {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 		}catch (Exception e){
 			System.out.println("\n"
-					+ "*************************************************\n"
-					+ "***com.mysql.jdbc.Driver instantiation FAILED!***\n"
-					+ "*************************************************\n");
+					+ " ----------------------------------\n"
+					+"|JDBC Driver initialization failure |\n"
+					+ " ----------------------------------\n");
 			halt("JDBC driver failure.");
 		}
 	}
 	
 	/*----------------------------------------------------------------------------------------------------------------------*/
-	
 	private static void addcustomerX(){
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("Adding Customer...");
 		System.out.println(" Please enter the id: ");
 		int id;
@@ -191,6 +211,7 @@ public class Main {
 					.getAdd(),customer.getEmail(),customer.getPwd());
 		} catch (SQLException e) {
 			System.out.println("Could not add customer");
+			return;
 		}
 		return;
 	}
@@ -212,10 +233,8 @@ public class Main {
 			 System.out.println(" Input not recognized");
 		 }
 	}
-	
 	//------------------------------------------------
 	private static void addstarX(){
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("Adding Star...");
 		System.out.println(" Please enter the id: ");
 		int id;
@@ -254,7 +273,8 @@ public class Main {
 			addstar(star.getId(),star.getFirst_name(),star.getLast_name(),star.getDob(),star.getPhotoURL());
 		}catch (SQLException e) {
 			System.out.println("Could not add star");
-			e.printStackTrace();
+//			e.printStackTrace();
+			return;
 		}
 		return;
 	}
@@ -270,23 +290,27 @@ public class Main {
 		 System.out.println("Star "+first+" "+last+" successfully added");
 		 }catch(SQLSyntaxErrorException e){
 			 System.out.println("Input not recognized");
+		 }catch(SQLException e1){
+//			 e1.printStackTrace();
+			 System.out.println("Data input error.\nTry again...");
 		 }
 	}
+	//------------------------------------------------
 	//------------------------------------------------
 	private static void deletecustomerX(){
 		System.out.println("Deleting customer...");
 		System.out.println(" Please enter the id: ");
-		int id2;
+		int id;
 		try {
-			id2= inp.nextInt();
-		} catch (InputMismatchException e1) {
+			id= inp.nextInt();
+		} catch (InputMismatchException e) {
 			System.out.println("You did not enter a number!!");
 			System.out.println("Try again");
 			return;
 		}	
 		
 		try {
-			deletecustomer(id2);
+			deletecustomer(id);
 		} catch (SQLException e) {
 			System.out.println("Customer record does not exist: ");
 		}
@@ -297,52 +321,103 @@ public class Main {
 		
 	}
 	//------------------------------------------------
+	//------------------------------------------------
 	private static void getmetadata() {   
-        boolean nextTable = false;
+//        boolean nextTable = false;
         try {
             
-            Statement select = connection.createStatement();
-            Statement tableQuery = connection.createStatement();
-            ResultSet tableList = tableQuery.executeQuery("SHOW TABLES");
-
-            
-            while (tableList.next()) {
-                if (nextTable) {
-                    //pause(); 
-                    System.out.println("______________________________________");
-                } else {
-                    nextTable = true;
-                }
-                String table = tableList.getString(1);
+            Statement query = connection.createStatement();
+            Statement primaryquery = connection.createStatement();
+            ResultSet res = primaryquery.executeQuery("SHOW TABLES");
+            System.out.println("------------------------------------------------");	
+            while (res.next()) {
+                
+                String table = res.getString(1);
                 System.out.println("\nTABLE: " + table);
-                ResultSet result = select.executeQuery("Select * from " + table);
+                ResultSet result = query.executeQuery("Select * from " + table);
                 ResultSetMetaData metadata = result.getMetaData();
-                System.out.println("\n" + metadata.getColumnCount() + "= number of columns");
+                System.out.println("\n" + "There are "+ metadata.getColumnCount()+ " in this table.");
                 for (int i = 1; i <= metadata.getColumnCount(); i++) {
-                    System.out.println("(" + i + ") " + metadata.getColumnName(i) + " :: " + metadata.getColumnTypeName(i));
+                    System.out.println( i + ". " + metadata.getColumnName(i) + " of type " + metadata.getColumnTypeName(i));
                 }
-                System.out.println("\n______________________________________");
+                System.out.println("------------------------------------------------");	
             }
-        } catch (SQLException ex) {
-            System.out.println(ex);
+            System.out.println();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Cannot get database metadata...");
+            System.out.println("Try again");
+            return;
         }
     }
+	//------------------------------------------------
 	//------------------------------------------------
 	private static void searchmoviesX() {
 		// TODO Auto-generated method stub
 		
 	}
 	//------------------------------------------------
-	private static void customqueryX(){
-		System.out.println("enter query");
-//		String cmd = inp.next();
-//		try {
-//			Statement query = connection.createStatement();
-//			query.executeQuery(cmd);
-//		} catch (SQLException e) {
-//			System.out.println(e);
-//		}
+	private static void customquery(String custom){
+		try {
+			Statement query = connection.createStatement();
+			ResultSet result = null;
+			ResultSetMetaData metadata = null;
+			result = query.executeQuery(custom);
+			metadata = result.getMetaData();
+			int n = metadata.getColumnCount();
+			while(result.next()){
+				System.out.println("Query Details : ");
+				for (int i =1;i<=n;i++){
+					System.out.println(i+".) "+metadata.getColumnName(i)+ " -> "+ result.getString(i));
+				}
+				System.out.println("\n\n");
+				
+			}
+		}catch(SQLSyntaxErrorException e){
+			System.out.println("SQL syntax error. Please review your SQL statement again");
+			System.out.println("The documentation and reference for MySQL : http://dev.mysql.com/doc/refman/5.7/en/ ");
+			return;
+		}
+		catch (SQLException e){
+			System.out.println("SQL exception");
+			e.printStackTrace();
+			return;
+		}
+		
 	}
-	
+	private static void customqueryupdate(String custom){
+		try {
+			Statement update = connection.createStatement();
+			int k = update.executeUpdate(custom);
+			System.out.println("Total modified column count: "+k);
+		}catch(SQLSyntaxErrorException e){
+			System.out.println("SQL syntax error. Please review your SQL statement again");
+			System.out.println("The documentation and reference for MySQL : http://dev.mysql.com/doc/refman/5.7/en/ ");
+			return;
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+			return;
+		}
+	}
+	private static void custom(){
+		System.out.println("Enter Query");
+		try {
+			String custom = br.readLine();
+			String arr[] = custom.split(" ", 2);
+			if(arr[0].compareToIgnoreCase("select")==0){
+				customquery(custom);
+			}
+			else if (arr[0].compareToIgnoreCase("update")==0 || arr[0].compareToIgnoreCase("insert")==0 || arr[0].compareToIgnoreCase("delete")==0){
+				customqueryupdate(custom);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Error while parsing SQL statement");
+			return;
+		}
+	}
+
+
 
 }
