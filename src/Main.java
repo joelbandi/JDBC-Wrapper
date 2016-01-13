@@ -18,13 +18,14 @@ public class Main {
 	private static Scanner inp = new Scanner(System.in);
 	private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	private static boolean exit;
-	private static String remote = "jdbc:mysql://176.32.230.251/cl57-moviedb";
-	private static String local = "jdbc:mysql://localhost:3306/moviedb";
-	private static String aws = "jdbc:mysql://172-31-19-179:3306/moviedb";
+	private static final String remote = "jdbc:mysql://176.32.230.251/cl57-moviedb";
+	private static final String local = "jdbc:mysql://localhost:3306/moviedb";
+	private static final String aws = "jdbc:mysql://ip-172-31-19-179:3306/moviedb";
 	private static String username;
 	private static String password;
 	private static Connection connection = null;
 	private static boolean loggedin;
+	private static String using = local;
 	
 	/*----------------------------------------------------------------------------------------------------------------------*/
 	public static void main(String[] arg) throws Exception{
@@ -157,11 +158,11 @@ public class Main {
 	};
 	
 	private static void loginToDatabase(){
-		
+		System.out.println("Please Login to your database");
 		System.out.println("Enter username: "); username = inp.next();
 		System.out.println("Password: "); password = inp.next();
 		try{
-			connection = (Connection)DriverManager.getConnection(local,username,password);
+			connection = (Connection)DriverManager.getConnection(using,username,password);
 			System.out.println("Congratulations! You are connected to the Database!!");
 			loggedin = true;
 		}catch(SQLException e){
@@ -170,7 +171,7 @@ public class Main {
 					+"|   FAILED to establish connection  |\n"
 					+ " ----------------------------------\n");
 			
-			e.printStackTrace();
+//			e.printStackTrace();
 			if(e.getErrorCode()==1045){
 				System.out.println("Wrong user name and/or password");
 				System.out.println("Try again? <y/n> ");
@@ -188,18 +189,18 @@ public class Main {
 		}
 	}
 	
-//	private static void jdbcInit(){
-//		try{
-//			Class.forName("com.mysql.jdbc.Driver").newInstance();
-//		}catch (Exception e){
-//			System.out.println("\n"
-//					+ " ----------------------------------\n"
-//					+"|JDBC Driver initialization failure |\n"
-//					+ " ----------------------------------\n");
-//			halt("JDBC driver failure.");
-//		}
-//	}
-//	
+	private static void jdbcInit(){
+		try{
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+		}catch (Exception e){
+			System.out.println("\n"
+					+ " ----------------------------------\n"
+					+"|JDBC Driver initialization failure |\n"
+					+ " ----------------------------------\n");
+			halt("JDBC driver failure.");
+		}
+	}
+
 	/*----------------------------------------------------------------------------------------------------------------------*/
 	private static void addcustomerX(){
 		System.out.println("Adding Customer...");
@@ -358,7 +359,7 @@ public class Main {
                 System.out.println("\nTABLE: " + table);
                 ResultSet result = query.executeQuery("Select * from " + table);
                 ResultSetMetaData metadata = result.getMetaData();
-                System.out.println("\n" + "There are "+ metadata.getColumnCount()+ " in this table.");
+                System.out.println("\n" + "There are "+ metadata.getColumnCount()+ " columns in this table.");
                 for (int i = 1; i <= metadata.getColumnCount(); i++) {
                     System.out.println( i + ". " + metadata.getColumnName(i) + " of type " + metadata.getColumnTypeName(i));
                 }
@@ -399,9 +400,11 @@ public class Main {
 			System.out.println("SQL syntax error. Please review your SQL statement again");
 			System.out.println("The documentation and reference for MySQL : http://dev.mysql.com/doc/refman/5.7/en/ ");
 			return;
-		}
-		catch (SQLException e){
+		}catch (SQLException e){
 			System.out.println("SQL exception");
+			e.printStackTrace();
+			return;
+		}catch(Exception e ){
 			e.printStackTrace();
 			return;
 		}
@@ -432,9 +435,12 @@ public class Main {
 			}
 			else if (arr[0].compareToIgnoreCase("update")==0 || arr[0].compareToIgnoreCase("insert")==0 || arr[0].compareToIgnoreCase("delete")==0){
 				customqueryupdate(custom);
+				System.out.println("update triggered");
 			}
 			else {
 				System.out.println("SQL query not recognized");
+				System.out.println("Probable syntax Errors");
+				System.out.println("The documentation and reference for MySQL : http://dev.mysql.com/doc/refman/5.7/en/ ");
 				return;
 			}
 		} catch (IOException e) {
@@ -448,7 +454,7 @@ public class Main {
 		try {
 			connection.close();
 			loggedin = false;
-			System.out.println("Logging out... \n\n\n");
+			System.out.println("Logging out... \n\n");
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
