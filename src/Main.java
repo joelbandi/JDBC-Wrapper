@@ -25,7 +25,7 @@ public class Main {
 	private static String password;
 	private static Connection connection = null;
 	private static boolean loggedin;
-	private static String using = local;
+	private static String using = remote;
 	
 	/*----------------------------------------------------------------------------------------------------------------------*/
 	public static void main(String[] arg) throws Exception{
@@ -80,7 +80,7 @@ public class Main {
 			
 		}
 		/*----------------------------------------------------------------------------------------------------------------------*/
-		System.out.println("\nbye...");
+		System.out.println("bye...\n");
 		
 		
 	}
@@ -253,6 +253,7 @@ public class Main {
 		 System.out.println("Customer "+first+" "+last+" successfully added");
 		 }catch(SQLIntegrityConstraintViolationException e){
 			 System.out.println("Credit card does not exist");
+			 System.out.println("Please eneter a valid credit card number");
 		 }catch(SQLSyntaxErrorException e){
 			 System.out.println(" Input not recognized");
 		 }
@@ -376,9 +377,186 @@ public class Main {
 	//------------------------------------------------
 	//------------------------------------------------
 	private static void searchmoviesX() {
-		// TODO Auto-generated method stub
+		System.out.println(" Query by Actor's");
+		System.out.println(" 1. First Name ");
+		System.out.println(" 2. Last Name  ");
+		System.out.println(" 3. First & Last Name ");
+		System.out.println(" 4. Star ID ");
+		System.out.println("Please enter a numeric choice");
+		int option;
+		
+		option=inp.nextInt();
+		
+		
+		switch(option){
+		case 1:
+			System.out.println("Enter First Name: ");
+			
+			try {
+				String firstName;
+				firstName=br.readLine();
+				showStarMoviesFirst(firstName);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return;
+			}
+			break;
+		case 2:
+			System.out.println("Enter Last Name: ");
+			
+			try {
+				String lastName;
+				lastName=br.readLine();
+				showStarMoviesLast(lastName);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			break;
+		case 3:
+			System.out.println("Enter First Name: ");
+			String firstName;
+			String lastName;
+			try {
+				
+				firstName=br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+			System.out.println("Enter Last Name: ");
+			try {
+				lastName=br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+			try {
+				showStarMoviesFirstLast(firstName,lastName);
+			} catch (SQLException e) {
+				System.out.println("f and l");
+				e.printStackTrace();
+				return;
+			}
+			break;
+		case 4:
+			int id;
+			System.out.println("Enter id: ");
+			id=inp.nextInt();
+			try {
+				showStarMoviesid(id);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return;
+			}
+			break;
+		}
 		
 	}
+	private static void showStarMoviesid(int id) throws SQLException {
+			Statement query = connection.createStatement();
+			ResultSet result=query.executeQuery("SELECT * from movies where id=ALL(SELECT movie_id FROM stars_in_movies where star_id="+id+")"+";");
+			ResultSetMetaData metadata = result.getMetaData();
+//			while(result.next())
+//			{
+//				System.out.println("------------------------------------------------");
+//				System.out.println("Movie Title -> "+ result.getString(2));
+//				System.out.println("Year of production -> "+ result.getString(3));
+//				System.out.println("Director -> "+ result.getString(4));
+//				System.out.println("Banner URL -> "+ result.getString(5));
+//				System.out.println("Trailer URL -> "+ result.getString(6));
+//				System.out.println("------------------------------------------------ \n");
+//			}
+			while(result.next()){
+				System.out.println("Query Details : ");
+				for (int i =1;i<=metadata.getColumnCount();i++){
+					System.out.println(i+".) "+metadata.getColumnName(i)+ " -> "+ result.getString(i));
+				}
+				System.out.println("------------------------------------------------");
+				System.out.println("\n\n");
+				
+			}
+
+	}
+	private static void showStarMoviesFirstLast(String firstName, String lastName) throws SQLException {
+			Statement statement = connection.createStatement();
+			ResultSet result=statement.executeQuery("SELECT * from movies where id IN(SELECT movie_id FROM stars_in_movies where star_id IN(select id from stars where first_name='"+firstName+"' AND last_name='"+lastName+"'));");
+			ResultSetMetaData metadata = result.getMetaData();
+//			while(result.next())
+//			{
+//				System.out.println("================================================");
+//				System.out.println("Movie Title: "+ result.getString(2));
+//				System.out.println("Year of production: "+ result.getString(3));
+//				System.out.println("Director: "+ result.getString(4));
+//				System.out.println("Banner URL: "+ result.getString(5));
+//				System.out.println("Trailer URL: "+ result.getString(6));
+//				System.out.println("\n\n================================================");
+//			}
+			while(result.next()){
+				System.out.println("Query Details : ");
+				for (int i =1;i<=metadata.getColumnCount();i++){
+					System.out.println(i+".) "+metadata.getColumnName(i)+ " -> "+ result.getString(i));
+				}
+				System.out.println("------------------------------------------------");
+				System.out.println("\n\n");
+				
+			}
+
+	}
+	private static void showStarMoviesLast(String lastName) throws SQLException {
+			Statement statement = connection.createStatement();
+			ResultSet result=statement.executeQuery("SELECT * from movies where id IN(SELECT movie_id FROM stars_in_movies where star_id IN(select id from stars where last_name='"+lastName+"'));");
+			ResultSetMetaData metadata = result.getMetaData();
+//			while(result.next())
+//			{
+//				System.out.println("================================================");
+//				System.out.println("Movie Title: "+ result.getString(2));
+//				System.out.println("Year of production: "+ result.getString(3));
+//				System.out.println("Director: "+ result.getString(4));
+//				System.out.println("Banner URL: "+ result.getString(5));
+//				System.out.println("Trailer URL: "+ result.getString(6));
+//				System.out.println("\n\n================================================");
+//			}
+			while(result.next()){
+				System.out.println("Query Details : ");
+				for (int i =1;i<=metadata.getColumnCount();i++){
+					System.out.println(i+".) "+metadata.getColumnName(i)+ " -> "+ result.getString(i));
+				}
+				System.out.println("------------------------------------------------");
+				System.out.println("\n\n");
+				
+			}
+		}
+	private static void showStarMoviesFirst(String firstName) throws SQLException {
+
+			Statement statement = connection.createStatement();
+			ResultSet result=statement.executeQuery("SELECT * from movies where id IN(SELECT movie_id FROM stars_in_movies where star_id IN(select id from stars where first_name='"+firstName+"'));");
+			ResultSetMetaData metadata = result.getMetaData();
+//			while(result.next())
+//			{
+//				System.out.println("================================================");
+//				System.out.println("Movie Title: "+ result.getString(2));
+//				System.out.println("Year of production: "+ result.getString(3));
+//				System.out.println("Director: "+ result.getString(4));
+//				System.out.println("Banner URL: "+ result.getString(5));
+//				System.out.println("Trailer URL: "+ result.getString(6));
+//				System.out.println("\n\n================================================");
+//			}
+			while(result.next()){
+				System.out.println("Query Details : ");
+				for (int i =1;i<=metadata.getColumnCount();i++){
+					System.out.println(i+".) "+metadata.getColumnName(i)+ " -> "+ result.getString(i));
+				}
+				System.out.println("------------------------------------------------");
+				System.out.println("\n\n");
+				
+			}
+		}
+	//------------------------------------------------
 	//------------------------------------------------
 	private static void customquery(String custom){
 		try {
@@ -393,6 +571,7 @@ public class Main {
 				for (int i =1;i<=n;i++){
 					System.out.println(i+".) "+metadata.getColumnName(i)+ " -> "+ result.getString(i));
 				}
+				System.out.println("------------------------------------------------");
 				System.out.println("\n\n");
 				
 			}
@@ -450,6 +629,7 @@ public class Main {
 		}
 	}
 	//------------------------------------------------
+	//------------------------------------------------
 	private static void Logout(){
 		try {
 			connection.close();
@@ -464,5 +644,6 @@ public class Main {
 			halt("");
 		}
 	}
+	//------------------------------------------------
 }
 
