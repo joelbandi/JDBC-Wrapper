@@ -19,6 +19,8 @@ public class Main {
 	private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 	private static boolean exit;
 	private static String remote = "jdbc:mysql://176.32.230.251/cl57-moviedb";
+	private static String local = "jdbc:mysql://localhost:3306/moviedb";
+	private static String aws = "jdbc:mysql://172-31-19-179:3306/moviedb";
 	private static String username;
 	private static String password;
 	private static Connection connection = null;
@@ -30,18 +32,34 @@ public class Main {
 		/*----------------------------------environment variable initialization-------------------------------------------------*/
 		System.out.println("Initializing environment variables...");
 		try {
-		    Thread.sleep(2000);         //2 seconds
+		    Thread.sleep(1000);         //1 seconds
 		} catch(InterruptedException ex) {
 		    Thread.currentThread().interrupt();
 		}
+		System.out.print(".");
+		try {
+		    Thread.sleep(1000);         //1 seconds
+		} catch(InterruptedException ex) {
+		    Thread.currentThread().interrupt();
+		}
+		System.out.print(".");
+		try {
+		    Thread.sleep(1000);         //1 seconds
+		} catch(InterruptedException ex) {
+		    Thread.currentThread().interrupt();
+		}
+		System.out.print(".");
+
+		
+		
 		exit = false;
 		loggedin = false;
 		/*----------------------------------------------------------------------------------------------------------------------*/
 
-		 
-		jdbcInit();
+		System.out.println("\n--->Welcome to PIKFLIX<---\n"); 
+//		jdbcInit();
 		
-		System.out.println("--->Welcome to PIKFLIX<---"); 
+		
 		
 		while(!loggedin && !exit){
 			loginToDatabase();
@@ -49,12 +67,16 @@ public class Main {
 		
 		/*---------------------------------------------super loop---------------------------------------------------------------*/
 		while(!exit){
+			while(!loggedin && !exit){
+				loginToDatabase();
+			}
 			mainMenu();
 //			try{
 //				mainMenu();
 //			}catch(InputMismatchException e){
 //				System.out.println("Please enter a valid option!");
 //			}
+			
 		}
 		/*----------------------------------------------------------------------------------------------------------------------*/
 		System.out.println("\nbye...");
@@ -111,6 +133,7 @@ public class Main {
 			
 			
 		case 7:
+			Logout();
 			break;
 			
 		case 8:
@@ -138,7 +161,7 @@ public class Main {
 		System.out.println("Enter username: "); username = inp.next();
 		System.out.println("Password: "); password = inp.next();
 		try{
-			connection = (Connection)DriverManager.getConnection(remote,username,password);
+			connection = (Connection)DriverManager.getConnection(local,username,password);
 			System.out.println("Congratulations! You are connected to the Database!!");
 			loggedin = true;
 		}catch(SQLException e){
@@ -146,6 +169,8 @@ public class Main {
 					+ " ----------------------------------\n"
 					+"|   FAILED to establish connection  |\n"
 					+ " ----------------------------------\n");
+			
+			e.printStackTrace();
 			if(e.getErrorCode()==1045){
 				System.out.println("Wrong user name and/or password");
 				System.out.println("Try again? <y/n> ");
@@ -163,18 +188,18 @@ public class Main {
 		}
 	}
 	
-	private static void jdbcInit(){
-		try{
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-		}catch (Exception e){
-			System.out.println("\n"
-					+ " ----------------------------------\n"
-					+"|JDBC Driver initialization failure |\n"
-					+ " ----------------------------------\n");
-			halt("JDBC driver failure.");
-		}
-	}
-	
+//	private static void jdbcInit(){
+//		try{
+//			Class.forName("com.mysql.jdbc.Driver").newInstance();
+//		}catch (Exception e){
+//			System.out.println("\n"
+//					+ " ----------------------------------\n"
+//					+"|JDBC Driver initialization failure |\n"
+//					+ " ----------------------------------\n");
+//			halt("JDBC driver failure.");
+//		}
+//	}
+//	
 	/*----------------------------------------------------------------------------------------------------------------------*/
 	private static void addcustomerX(){
 		System.out.println("Adding Customer...");
@@ -205,10 +230,8 @@ public class Main {
 			}
 
 		}
-		Customer customer = new Customer(id,ar.get(0),ar.get(1),ar.get(2),ar.get(3),ar.get(4),ar.get(5));
 		try {
-			addcustomer(customer.getId(),customer.getFirst_name(),customer.getLast_name(),customer.getCc(),customer
-					.getAdd(),customer.getEmail(),customer.getPwd());
+			addcustomer(id,ar.get(0),ar.get(1),ar.get(2),ar.get(3),ar.get(4),ar.get(5));
 		} catch (SQLException e) {
 			System.out.println("Could not add customer");
 			return;
@@ -268,9 +291,8 @@ public class Main {
 			ar.set(0,"");
 		}
 	
-		Star star = new Star(id,ar.get(0),ar.get(1),ar.get(2),ar.get(3));
 		try {
-			addstar(star.getId(),star.getFirst_name(),star.getLast_name(),star.getDob(),star.getPhotoURL());
+			addstar(id,ar.get(0),ar.get(1),ar.get(2),ar.get(3));
 		}catch (SQLException e) {
 			System.out.println("Could not add star");
 //			e.printStackTrace();
@@ -411,13 +433,30 @@ public class Main {
 			else if (arr[0].compareToIgnoreCase("update")==0 || arr[0].compareToIgnoreCase("insert")==0 || arr[0].compareToIgnoreCase("delete")==0){
 				customqueryupdate(custom);
 			}
+			else {
+				System.out.println("SQL query not recognized");
+				return;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Error while parsing SQL statement");
 			return;
 		}
 	}
-
-
-
+	//------------------------------------------------
+	private static void Logout(){
+		try {
+			connection.close();
+			loggedin = false;
+			System.out.println("Logging out... \n\n\n");
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Unable to release resources");
+			System.out.println("killing whole program as an alternative please start the program again");
+			halt("");
+		}
+	}
 }
+
